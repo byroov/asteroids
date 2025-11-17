@@ -1,1 +1,4 @@
 game_state.jsonl
+pycache/
+*.pyc
+
