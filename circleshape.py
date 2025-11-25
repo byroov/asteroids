@@ -1,5 +1,6 @@
 import pygame
 import constants
+from logger import log_event
 
 
 # Base class for game objects
@@ -25,3 +26,10 @@ class CircleShape(pygame.sprite.Sprite):
             rotate(-dt)
         if keys[pygame.K_d]:
             rotate(dt)
+
+    def collides_with(self, other):
+        distance = self.position.distance_to(other.position)
+        r1_r2 = self.radius + other.radius 
+        if distance <= r1_r2:
+            return True
+        return False

@@ -1,30 +1,40 @@
 import pygame
-import circleshape
-import constants
+from circleshape import CircleShape
+from constants import *
+from shot import Shot
 
 
 
 
-class Player(circleshape.CircleShape):
+class Player(CircleShape):
     def __init__(self, x, y):
-        super().__init__(x, y, constants.PLAYER_RADIUS)
+        super().__init__(x, y, PLAYER_RADIUS)
+
+        self.position = pygame.Vector2(x, y)
         self.rotation = 0
-        x = constants.SCREEN_WIDTH / 2
-        y = constants.SCREEN_HEIGHT / 2
+        x = SCREEN_WIDTH / 2
+        y = SCREEN_HEIGHT / 2
+        self.cool_down = 0.0
+        
+      
 
 
     def rotate(self, dt):
-        self.rotation += constants.PLAYER_TURN_SPEED * dt
+        self.rotation += PLAYER_TURN_SPEED * dt
 
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * constants.PLAYER_SPEED * dt
+        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
 
 
     def update(self, dt):
+        if self.cool_down > 0:
+            self.cool_down -= dt
+
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.rotate(-dt)
@@ -34,6 +44,8 @@ class Player(circleshape.CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
+        if keys[pygame.K_SPACE]:
+            self.shoot()
 
         # in the Player class
     def triangle(self):
@@ -43,3 +55,11 @@ class Player(circleshape.CircleShape):
         b = self.position - forward * self.radius - right
         c = self.position - forward * self.radius + right
         return [a, b, c]
+    
+    def shoot(self):
+        if self.cool_down > 0:
+            return
+        
+        self.cool_down = PLAYER_SHOOT_COOLDOWN_SECONDS
+        shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
+        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
