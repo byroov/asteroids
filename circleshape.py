@@ -20,5 +20,8 @@ class CircleShape(pygame.sprite.Sprite):
         
 
     def update(self, dt):
-        # must override
-        pass
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            rotate(-dt)
+        if keys[pygame.K_d]:
+            rotate(dt)
